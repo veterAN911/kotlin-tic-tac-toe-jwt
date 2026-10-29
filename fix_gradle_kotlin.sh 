@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo "=== Killing Kotlin Daemon ==="
+pkill -f kotlin-daemon || true
+
+echo "=== Killing Gradle Daemon ==="
+./gradlew --stop || true
+gradle --stop || true
+
+echo "=== Removing Kotlin caches ==="
+rm -rf ~/.kotlin
+rm -rf ~/Library/Application\ Support/Kotlin
+
+echo "=== Removing Gradle caches ==="
+rm -rf ~/.gradle/daemon
+rm -rf ~/.gradle/caches
+rm -rf ~/.gradle/jdks
+
+echo "=== Removing JetBrains Runtime caches ==="
+rm -rf ~/Library/Java/JavaVirtualMachines/jbr-*
+
+echo "=== Removing IntelliJ IDEA caches (safe) ==="
+rm -rf ~/Library/Caches/JetBrains
+rm -rf ~/Library/Caches/IntelliJIdea*
+
+echo "=== Rebuilding project with wrapper ==="
+./gradlew clean build
+
+echo "=== Done ==="

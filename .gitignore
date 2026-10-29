@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+out/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Kotlin
+.kotlin/
+
+# macOS
+.DS_Store
+
+# Runtime logs
+game-log.txt
+*.log

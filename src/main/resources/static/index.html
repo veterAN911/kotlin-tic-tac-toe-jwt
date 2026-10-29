@@ -1,0 +1,2692 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+
+        :root {
+
+            --bg-deep: #06060C;
+            --bg-base: #0C0C16;
+            --bg-elevated: #12121F;
+            --bg-surface: #181827;
+            --bg-overlay: #1E1E30;
+
+
+            --glass-strong: rgba(18, 18, 31, 0.85);
+            --glass-medium: rgba(24, 24, 39, 0.72);
+            --glass-light: rgba(30, 30, 48, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --glass-border-hover: rgba(255, 255, 255, 0.14);
+            --glass-border-accent: rgba(139, 92, 246, 0.35);
+
+
+            --accent: #7C3AED;
+            --accent-strong: #6D28D9;
+            --accent-light: #A78BFA;
+            --accent-glow: rgba(124, 58, 237, 0.35);
+            --accent-glow-strong: rgba(139, 92, 246, 0.55);
+            --accent-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 50%, #C084FC 100%);
+            --accent-gradient-horizontal: linear-gradient(90deg, #6D28D9, #8B5CF6, #A78BFA);
+            --accent-gradient-warm: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+
+
+            --blue-accent: #3B82F6;
+            --cyan-accent: #06B6D4;
+            --blue-gradient: linear-gradient(135deg, #3B82F6, #06B6D4);
+            --gold: #F59E0B;
+            --gold-light: #FBBF24;
+            --gold-gradient: linear-gradient(135deg, #F59E0B, #FBBF24);
+
+
+            --success: #22C55E;
+            --success-glow: rgba(34, 197, 94, 0.3);
+            --danger: #EF4444;
+            --danger-glow: rgba(239, 68, 68, 0.3);
+
+
+            --text-primary: #F1F1F6;
+            --text-secondary: #A1A1AA;
+            --text-muted: #71717A;
+            --text-sidebar: #D4D4D8;
+            --text-sidebar-muted: #71717A;
+
+
+            --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+            --shadow-2: 0 4px 8px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-3: 0 8px 24px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+            --shadow-4: 0 16px 48px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5);
+            --shadow-glow-purple: 0 0 40px rgba(124, 58, 237, 0.2), 0 0 80px rgba(124, 58, 237, 0.1);
+            --shadow-glow-blue: 0 0 40px rgba(59, 130, 246, 0.2), 0 0 80px rgba(59, 130, 246, 0.08);
+
+
+            --radius-xs: 6px;
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 28px;
+            --radius-2xl: 36px;
+            --radius-full: 9999px;
+
+
+            --font: 'Inter', -apple-system, 'YS Text', 'Helvetica Neue', Arial, sans-serif;
+            --sidebar-width: 264px;
+            --header-height: 60px;
+
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+            --duration-fast: 150ms;
+            --duration-normal: 300ms;
+            --duration-slow: 500ms;
+            --duration-very-slow: 800ms;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse 80% 60% at 20% 15%, rgba(124, 58, 237, 0.10) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 70% at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 70%),
+            radial-gradient(ellipse 40% 30% at 85% 20%, rgba(236, 72, 153, 0.05) 0%, transparent 55%);
+        }
+
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+
+        .header {
+            height: var(--header-height);
+            background: var(--glass-strong);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, var(--shadow-2);
+        }
+
+        .header-logo {
+            font-size: 17px;
+            font-weight: 700;
+            background: var(--accent-gradient-horizontal);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo::before {
+            content: '✕⭘';
+            font-size: 19px;
+            letter-spacing: 0;
+            -webkit-text-fill-color: initial;
+            color: var(--accent-light);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: var(--radius-full);
+            background: var(--accent-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 0 16px var(--accent-glow);
+            position: relative;
+        }
+
+        .user-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius-full);
+            background: var(--accent-gradient);
+            z-index: -1;
+            opacity: 0.4;
+            filter: blur(8px);
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary);
+            letter-spacing: 0.2px;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 7px 18px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: 12.5px;
+            font-family: var(--font);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            transition: all var(--duration-normal) var(--ease-out-expo);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .btn-logout:hover {
+            border-color: rgba(239, 68, 68, 0.4);
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: 0 0 20px var(--danger-glow);
+            transform: translateY(-1px);
+        }
+
+
+        .main-layout {
+            display: flex;
+            flex: 1;
+            min-height: calc(100vh - var(--header-height));
+            position: relative;
+            z-index: 1;
+        }
+
+
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: var(--glass-strong);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 50;
+            border-right: 1px solid var(--glass-border);
+            box-shadow: 2px 0 24px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(124, 58, 237, 0.04) 0%, transparent 30%, transparent 70%, rgba(59, 130, 246, 0.04) 100%);
+            z-index: 0;
+        }
+
+        .sidebar-logo {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-sidebar);
+            letter-spacing: 0.8px;
+            padding: 0 20px 18px;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar-section {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: filter 0.6s ease, opacity 0.6s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar-section.blurred {
+            filter: blur(10px) grayscale(0.4);
+            opacity: 0.35;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .sidebar-section.blurred * {
+            pointer-events: none;
+        }
+
+        .sidebar-section-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-sidebar-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+
+        .sidebar-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .sidebar-table th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 5px 6px;
+            border-bottom: 1px solid var(--glass-border);
+            text-align: left;
+        }
+
+        .sidebar-table td {
+            padding: 5px 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-sidebar);
+            transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+
+        .sidebar-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-xs);
+        }
+
+        .sidebar-table .rank {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            text-align: center;
+            width: 24px;
+            font-size: 11px;
+        }
+
+        .sidebar-table .login-col {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sidebar-table .ratio-col {
+            color: var(--success);
+            font-weight: 600;
+            text-align: right;
+            text-shadow: 0 0 12px var(--success-glow);
+        }
+
+
+        .sidebar-history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 11px;
+            color: var(--text-sidebar);
+            transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+
+        .sidebar-history-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-xs);
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .sidebar-history-item .opponent {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sidebar-history-item .result {
+            font-weight: 700;
+            margin-left: 8px;
+            white-space: nowrap;
+            font-size: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .sidebar-history-item .result.win {
+            color: var(--success);
+            text-shadow: 0 0 10px var(--success-glow);
+        }
+
+        .sidebar-history-item .result.loss {
+            color: var(--danger);
+            text-shadow: 0 0 10px var(--danger-glow);
+        }
+
+        .sidebar-history-item .result.draw {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 11px;
+            padding: 16px 0;
+        }
+
+        .sidebar-loading {
+            text-align: center;
+            color: var(--accent-light);
+            font-size: 11px;
+            padding: 16px 0;
+        }
+
+        @keyframes subtlePulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.45;
+            }
+        }
+
+        .subtle-pulse {
+            animation: subtlePulse 1.8s infinite;
+        }
+
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 28px 36px;
+            overflow-y: auto;
+            min-width: 0;
+            position: relative;
+        }
+
+
+        .feed-container {
+            width: 100%;
+            max-width: 720px;
+            margin-bottom: 28px;
+        }
+
+        .feed-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feed-title::after {
+            content: '';
+            flex: 1;
+            height: 0.5px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent);
+        }
+
+        .feed-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 4px 2px 8px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            height: 142px;
+            min-height: 142px;
+            max-height: 142px;
+            align-items: start;
+        }
+
+        .feed-scroll::-webkit-scrollbar {
+            height: 2px;
+        }
+
+        .feed-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .feed-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+        }
+
+        .feed-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .feed-card {
+            min-width: 108px;
+            max-width: 108px;
+            background: var(--glass-medium);
+            backdrop-filter: blur(14px) saturate(150%);
+            -webkit-backdrop-filter: blur(14px) saturate(150%);
+            border-radius: var(--radius-sm);
+            padding: 7px 6px;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out-expo);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-2);
+            animation: cardSlideIn 0.4s var(--ease-out-back) both;
+        }
+
+
+        .feed-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .feed-card:nth-child(2) {
+            animation-delay: 0.10s;
+        }
+
+        .feed-card:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .feed-card:nth-child(4) {
+            animation-delay: 0.20s;
+        }
+
+        .feed-card:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        @keyframes cardSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px) scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+
+        .feed-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+            opacity: 0;
+            transition: opacity var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .feed-card:hover::before {
+            opacity: 1;
+        }
+
+        .feed-card:hover {
+            border-color: var(--glass-border-accent);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-4), var(--shadow-glow-purple);
+            background: rgba(24, 24, 45, 0.85);
+        }
+
+        .feed-card.current-game {
+            border-color: var(--accent-light);
+            box-shadow: var(--shadow-3), 0 0 32px var(--accent-glow);
+            background: rgba(30, 20, 55, 0.75);
+        }
+
+        .feed-card.current-game::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.4), transparent 40%, transparent 60%, rgba(139, 92, 246, 0.3));
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .feed-mini-board {
+            display: grid;
+            grid-template-columns: repeat(3, 13px);
+            grid-template-rows: repeat(3, 13px);
+            gap: 1.5px;
+        }
+
+        .feed-mini-cell {
+            width: 13px;
+            height: 13px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            font-weight: 700;
+            border: 0.5px solid rgba(255, 255, 255, 0.04);
+            transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+
+        .feed-mini-cell.x {
+            color: var(--accent-light);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .feed-mini-cell.o {
+            color: var(--danger);
+            text-shadow: 0 0 8px var(--danger-glow);
+        }
+
+        .feed-opponent {
+            font-size: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            letter-spacing: 0.1px;
+        }
+
+        .feed-date {
+            font-size: 6.5px;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+
+        .feed-uuid {
+            font-size: 5.5px;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+            font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+            opacity: 0.4;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .feed-timer-container {
+            position: relative;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feed-timer-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 22px;
+            height: 22px;
+            transform: rotate(-90deg);
+        }
+
+        .feed-timer-ring .bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 2;
+        }
+
+        .feed-timer-ring .fg {
+            fill: none;
+            stroke: url(#feedTimerGradient);
+            stroke-width: 2;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.4s var(--ease-out-expo), stroke 0.3s;
+            filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.5));
+        }
+
+        .feed-timer-ring .fg.urgent {
+            stroke: var(--danger);
+            filter: drop-shadow(0 0 3px var(--danger-glow));
+        }
+
+        .feed-timer-text {
+            font-size: 6px;
+            font-weight: 700;
+            color: var(--text-primary);
+            z-index: 1;
+            letter-spacing: 0.1px;
+        }
+
+        .feed-empty {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+            background: var(--glass-medium);
+            border-radius: var(--radius-md);
+            width: 100%;
+            border: 1px solid var(--glass-border);
+            height: 142px;
+            min-height: 142px;
+            max-height: 142px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        #menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-top: 80px;
+            animation: menuFadeUp 0.7s var(--ease-out-expo);
+        }
+
+        @keyframes menuFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #menu h1 {
+            font-size: 30px;
+            font-weight: 700;
+            background: var(--accent-gradient-horizontal);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 28px;
+            letter-spacing: -0.5px;
+            filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.3));
+        }
+
+
+        .btn {
+            position: relative;
+            background: var(--accent-gradient);
+            color: #fff;
+            border: none;
+            padding: 13px 30px;
+            margin: 5px;
+            border-radius: var(--radius-full);
+            font-family: var(--font);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out-expo);
+            white-space: nowrap;
+            box-shadow: 0 4px 16px var(--accent-glow);
+            overflow: hidden;
+        }
+
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity var(--duration-fast) var(--ease-out-expo);
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 28px var(--accent-glow-strong);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px var(--accent-glow);
+            transition: all 80ms var(--ease-out-expo);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            filter: grayscale(0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-light);
+            border: 1.5px solid rgba(139, 92, 246, 0.35);
+            box-shadow: none;
+        }
+
+        .btn-secondary::after {
+            display: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.08);
+            border-color: var(--accent-light);
+            box-shadow: 0 0 24px var(--accent-glow);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 1.5px solid rgba(239, 68, 68, 0.35);
+            box-shadow: none;
+        }
+
+        .btn-danger::after {
+            display: none;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.6);
+            box-shadow: 0 0 24px var(--danger-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-large {
+            padding: 15px 40px;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+
+
+        .game-uuid {
+            font-size: 8px;
+            font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            opacity: 0.4;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 8px;
+            user-select: all;
+            cursor: text;
+            transition: opacity 0.3s;
+        }
+
+        .game-uuid:hover {
+            opacity: 0.7;
+        }
+
+
+        .board-wrapper {
+            position: relative;
+            transition: opacity 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo);
+        }
+
+        .board-wrapper.switching-out {
+            opacity: 0;
+            transform: scale(0.94);
+            pointer-events: none;
+        }
+
+        .board-wrapper.switching-in {
+            animation: boardSwitchIn 0.45s var(--ease-out-back);
+        }
+
+        @keyframes boardSwitchIn {
+            from {
+                opacity: 0;
+                transform: scale(0.94) translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+
+        .move-timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 72px;
+            height: 72px;
+            animation: timerPopIn 0.5s var(--ease-out-back);
+        }
+
+        @keyframes timerPopIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .move-timer-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 72px;
+            height: 72px;
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.4));
+        }
+
+        .move-timer-ring .bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 4;
+        }
+
+        .move-timer-ring .fg {
+            fill: none;
+            stroke: url(#moveTimerGradient);
+            stroke-width: 4;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.4s var(--ease-out-expo), stroke 0.3s;
+        }
+
+        .move-timer-ring .fg.urgent {
+            stroke: var(--danger);
+            filter: drop-shadow(0 0 14px var(--danger-glow));
+        }
+
+        .move-timer-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+
+
+        #board {
+            display: none;
+            grid-template-columns: repeat(3, 104px);
+            grid-template-rows: repeat(3, 104px);
+            gap: 10px;
+            padding: 20px;
+            background: var(--glass-medium);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-4);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            animation: boardAppear 0.6s var(--ease-out-expo);
+        }
+
+        @keyframes boardAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+
+        #board::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: calc(var(--radius-xl) + 2px);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), transparent 40%, transparent 60%, rgba(59, 130, 246, 0.15));
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .cell {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            border-radius: var(--radius-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 46px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-out-expo);
+            user-select: none;
+            color: var(--text-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .cell:hover {
+            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(139, 92, 246, 0.35);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.2);
+        }
+
+        .cell.x {
+            color: var(--accent-light);
+            text-shadow: 0 0 20px var(--accent-glow);
+            animation: cellPopX 0.4s var(--ease-out-back);
+            background: rgba(124, 58, 237, 0.06);
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+
+        .cell.o {
+            color: var(--danger);
+            text-shadow: 0 0 20px var(--danger-glow);
+            animation: cellPopO 0.4s var(--ease-out-back);
+            background: rgba(239, 68, 68, 0.06);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        @keyframes cellPopX {
+            0% {
+                transform: scale(0) rotateX(90deg);
+            }
+            60% {
+                transform: scale(1.18) rotateX(0deg);
+            }
+            100% {
+                transform: scale(1) rotateX(0deg);
+            }
+        }
+
+        @keyframes cellPopO {
+            0% {
+                transform: scale(0) rotateY(90deg);
+            }
+            60% {
+                transform: scale(1.18) rotateY(0deg);
+            }
+            100% {
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+
+        #status {
+            margin: 14px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-height: 20px;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        #status.pulse {
+            animation: subtlePulse 1.2s infinite;
+            color: var(--accent-light);
+        }
+
+
+        .message-box {
+            margin: 14px auto;
+            padding: 14px 24px;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            display: none;
+            max-width: 420px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            letter-spacing: 0.3px;
+            animation: msgSlideUp 0.45s var(--ease-out-back);
+        }
+
+        @keyframes msgSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #winBox {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: var(--success);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.1);
+            text-shadow: 0 0 12px var(--success-glow);
+        }
+
+        #errorBox {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: var(--danger);
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.1);
+            text-shadow: 0 0 12px var(--danger-glow);
+        }
+
+
+        .game-controls {
+            display: none;
+            gap: 12px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: msgSlideUp 0.5s var(--ease-out-back);
+        }
+
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(6, 6, 12, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+            animation: modalBgIn 0.4s var(--ease-out-expo);
+        }
+
+        @keyframes modalBgIn {
+            from {
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+            to {
+                opacity: 1;
+                backdrop-filter: blur(12px);
+            }
+        }
+
+        .modal-content {
+            background: var(--glass-strong);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            padding: 44px;
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-4), var(--shadow-glow-purple);
+            text-align: center;
+            min-width: 360px;
+            max-width: 420px;
+            border: 1px solid var(--glass-border);
+            animation: modalCardIn 0.5s var(--ease-out-back);
+            position: relative;
+        }
+
+        @keyframes modalCardIn {
+            from {
+                opacity: 0;
+                transform: scale(0.88) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 40px;
+            right: 40px;
+            height: 1px;
+            background: var(--accent-gradient-horizontal);
+            opacity: 0.7;
+        }
+
+        .modal-content h2 {
+            margin: 0 0 28px;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 23px;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 13px 18px;
+            margin: 9px 0;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1.5px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 14px;
+            outline: none;
+            transition: all var(--duration-normal) var(--ease-out-expo);
+            letter-spacing: 0.3px;
+        }
+
+        .modal-content input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .modal-content input:focus {
+            border-color: var(--accent-light);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12), 0 0 24px var(--accent-glow);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .modal-content .buttons {
+            margin-top: 28px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-error {
+            margin-top: 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--danger);
+            display: none;
+            letter-spacing: 0.3px;
+            text-shadow: 0 0 10px var(--danger-glow);
+        }
+
+        .modal-error.success {
+            color: var(--success);
+            text-shadow: 0 0 10px var(--success-glow);
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s var(--ease-out-back);
+        }
+
+
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+
+            .content {
+                padding: 20px 16px;
+            }
+
+            .feed-container {
+                max-width: 100%;
+            }
+
+            #board {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+                gap: 7px;
+                padding: 14px;
+            }
+
+            .cell {
+                font-size: 38px;
+                border-radius: var(--radius-sm);
+            }
+
+            .header-logo {
+                font-size: 14px;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            #menu h1 {
+                font-size: 22px;
+            }
+
+            .feed-card {
+                min-width: 96px;
+                max-width: 96px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #board {
+                grid-template-columns: repeat(3, 68px);
+                grid-template-rows: repeat(3, 68px);
+                gap: 5px;
+                padding: 10px;
+            }
+
+            .cell {
+                font-size: 30px;
+            }
+
+            .modal-content {
+                min-width: auto;
+                margin: 16px;
+                padding: 28px 20px;
+            }
+
+            .btn-large {
+                padding: 12px 28px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<svg width="0" height="0" style="position:absolute;pointer-events:none;" aria-hidden="true">
+    <defs>
+        <linearGradient id="feedTimerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#7C3AED"/>
+            <stop offset="50%" stop-color="#A78BFA"/>
+            <stop offset="100%" stop-color="#C084FC"/>
+        </linearGradient>
+        <linearGradient id="moveTimerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#A78BFA"/>
+        </linearGradient>
+    </defs>
+</svg>
+
+<header class="header" id="topBar" style="display:none;">
+    <div class="header-logo">TIC-TAC-TOE</div>
+    <div class="header-right">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span class="user-name" id="userInfo"></span>
+        <button class="btn-logout" id="logoutBtn">Выйти</button>
+    </div>
+</header>
+
+<div class="main-layout">
+
+
+    <aside class="sidebar" id="sidebarContainer">
+        <div class="sidebar-logo">🎮 TIC-TAC-TOE</div>
+
+
+        <div class="sidebar-section blurred" id="leaderboardPanel">
+            <div class="sidebar-section-title">🏆 Таблица лидеров</div>
+            <div class="sidebar-loading subtle-pulse" id="lbLoading">Загрузка...</div>
+            <table class="sidebar-table" id="lbTable" style="display:none;">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Игрок</th>
+                    <th>Медиана побед</th>
+                </tr>
+                </thead>
+                <tbody id="lbBody"></tbody>
+            </table>
+            <div class="sidebar-empty" id="lbEmpty" style="display:none;">Нет данных</div>
+        </div>
+
+
+        <div class="sidebar-section blurred" id="historyPanel">
+            <div class="sidebar-section-title">📜 История игр</div>
+            <div class="sidebar-loading subtle-pulse" id="histLoading">Загрузка...</div>
+            <ul class="sidebar-history-list" id="histList" style="display:none;"></ul>
+            <div class="sidebar-empty" id="histEmpty" style="display:none;">Нет завершённых игр</div>
+        </div>
+    </aside>
+
+
+    <main class="content" id="mainContent">
+
+
+        <div class="feed-container" id="feedContainer">
+            <div class="feed-title">🎯 Активные игры</div>
+            <div class="feed-scroll" id="feedScroll"></div>
+            <div class="feed-empty" id="feedEmpty" style="display:none;">Нет активных игр</div>
+        </div>
+
+
+        <div id="menu" style="display:none;">
+            <h1>КРЕСТИКИ-НОЛИКИ</h1>
+            <button class="btn btn-large" id="botBtn">🤖 Играть с ботом</button>
+            <button class="btn btn-large btn-secondary" id="humanBtn">👥 Играть с человеком</button>
+        </div>
+
+
+        <div class="move-timer-container" id="moveTimerContainer" style="display:none;">
+            <svg class="move-timer-ring" viewBox="0 0 64 64" width="64" height="64">
+                <circle class="bg" cx="32" cy="32" r="28"/>
+                <circle class="fg" id="moveTimerFg" cx="32" cy="32" r="28"
+                        stroke-dasharray="175.93" stroke-dashoffset="0"/>
+            </svg>
+            <span class="move-timer-text" id="moveTimerText">15</span>
+        </div>
+
+
+        <div class="game-uuid" id="gameUuid" style="display:none;"></div>
+        <div class="board-wrapper" id="boardWrapper">
+            <div id="board"></div>
+        </div>
+
+
+        <div id="status"></div>
+
+
+        <div id="winBox" class="message-box"></div>
+        <div id="errorBox" class="message-box"></div>
+
+
+        <div class="game-controls" id="gameControls">
+            <button class="btn" id="newGameBtn">Новая игра</button>
+            <button class="btn btn-danger" id="leaveBtn">Выйти из игры</button>
+        </div>
+    </main>
+</div>
+
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <h2>Вход в аккаунт</h2>
+        <input id="loginInput" placeholder="Логин" autocomplete="username">
+        <input id="passwordInput" placeholder="Пароль" type="password" autocomplete="current-password">
+        <div class="buttons">
+            <button class="btn btn-secondary" id="signupBtn">Регистрация</button>
+            <button class="btn" id="loginBtn">Войти</button>
+        </div>
+        <div class="modal-error" id="authError"></div>
+    </div>
+</div>
+
+<script>
+    const API = "http://localhost:8099";
+    const BOT_UUID = "00000000-0000-0000-0000-000000000001";
+
+
+    let accessToken = localStorage.getItem('accessToken') || null;
+    let refreshToken = localStorage.getItem('refreshToken') || null;
+    let currentUser = localStorage.getItem('currentUser') || null;
+    let myUserId = localStorage.getItem('myUserId') || null;
+
+    let gameId = null;
+    let board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    let mode = null;
+    let status = null;
+    let currentPlayer = null;
+    let winner = null;
+    let playerX = null;
+    let playerO = null;
+    let createdAt = null;
+
+    let cells = [];
+    const userNameCache = {};
+    let isRefreshing = false;
+
+
+    let activeGames = [];
+    let feedIntervalId = null;
+    let feedTimerIntervalId = null;
+
+
+    let moveTimerIntervalId = null;
+    let moveTimerTotal = 15;
+    let moveTimerRemaining = 15;
+    const MOVE_TIMER_CIRCUMFERENCE = 2 * Math.PI * 28;
+
+    const $ = id => document.getElementById(id);
+    const boardDiv = $("board");
+    const statusDiv = $("status");
+    const winBox = $("winBox");
+    const errorBox = $("errorBox");
+    const authError = $("authError");
+
+
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        } catch (e) {
+            console.error("Ошибка парсинга JWT:", e);
+            return null;
+        }
+    }
+
+    function extractUserIdFromToken(token) {
+        if (!token) return null;
+        const payload = parseJwt(token);
+        if (!payload) return null;
+        return payload.userId || payload.uuid || payload.sub || null;
+    }
+
+    function saveTokens(newAccess, newRefresh) {
+        accessToken = newAccess;
+        refreshToken = newRefresh || refreshToken;
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+
+        const extractedId = extractUserIdFromToken(accessToken);
+        if (extractedId) {
+            myUserId = extractedId;
+            localStorage.setItem('myUserId', myUserId);
+        }
+    }
+
+    function clearAuth() {
+        accessToken = null;
+        refreshToken = null;
+        currentUser = null;
+        myUserId = null;
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('myUserId');
+    }
+
+    function authHeaders() {
+        return {
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
+        };
+    }
+
+
+    async function fetchWithAuth(url, options = {}) {
+        let res = await fetch(url, {
+            ...options,
+            headers: {...authHeaders(), ...(options.headers || {})}
+        });
+
+        if (res.status === 401 && !url.includes('/auth/refresh')) {
+            if (!isRefreshing) {
+                isRefreshing = true;
+                const success = await attemptRefreshTokens();
+                isRefreshing = false;
+
+                if (!success) {
+                    forceLogout("Сессия истекла. Пожалуйста, войдите снова.");
+                    throw new Error("Unauthorized");
+                }
+            }
+
+            while (isRefreshing) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            res = await fetch(url, {
+                ...options,
+                headers: {...authHeaders(), ...(options.headers || {})}
+            });
+        }
+
+        return res;
+    }
+
+    async function attemptRefreshTokens() {
+        if (!refreshToken) return false;
+        try {
+            let res = await fetch(`${API}/auth/refresh/access`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({refreshToken: refreshToken})
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                saveTokens(data.accessToken, data.refreshToken);
+                return true;
+            }
+
+            res = await fetch(`${API}/auth/refresh/refresh`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({refreshToken: refreshToken})
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                saveTokens(data.accessToken, data.refreshToken);
+                return true;
+            }
+
+            return false;
+        } catch (e) {
+            console.error("Ошибка обновления токенов:", e);
+            return false;
+        }
+    }
+
+
+    function showAuthError(msg) {
+        authError.innerText = msg;
+        authError.style.display = "block";
+        authError.classList.remove("success");
+    }
+
+    function showAuthSuccess(msg) {
+        authError.innerText = msg;
+        authError.style.display = "block";
+        authError.classList.add("success");
+    }
+
+    function showError(msg) {
+        errorBox.innerText = msg;
+        errorBox.style.display = "block";
+    }
+
+    function hideError() {
+        errorBox.style.display = "none";
+    }
+
+    function showWin(msg) {
+        winBox.innerText = msg;
+        winBox.style.display = "block";
+    }
+
+    function hideWin() {
+        winBox.style.display = "none";
+    }
+
+    function forceLogout(msg = "Сессия завершена") {
+        clearAuth();
+        stopMoveTimer();
+        stopFeedPolling();
+        resetGame();
+        $("topBar").style.display = "none";
+        $("menu").style.display = "none";
+        $("feedContainer").style.display = "none";
+        $("authModal").style.display = "flex";
+        $("loginInput").value = "";
+        $("passwordInput").value = "";
+        showAuthError(msg);
+        setPanelBlurred(document.getElementById("leaderboardPanel"), true);
+        setPanelBlurred(document.getElementById("historyPanel"), true);
+    }
+
+    async function fetchUserName(uuid) {
+        if (!uuid) return null;
+        if (uuid === BOT_UUID) return "🤖 Бот";
+        if (userNameCache[uuid]) return userNameCache[uuid];
+        try {
+            const res = await fetchWithAuth(`${API}/user/${uuid}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            userNameCache[uuid] = data.login;
+            return data.login;
+        } catch {
+            return null;
+        }
+    }
+
+
+    function formatDate(ms) {
+        if (!ms) return "";
+        const d = new Date(ms);
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const min = String(d.getMinutes()).padStart(2, '0');
+        return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
+    }
+
+
+    function checkExistingSession() {
+        if (accessToken && refreshToken && myUserId) {
+            updateHeaderUI(currentUser || "Игрок");
+            $("authModal").style.display = "none";
+            $("topBar").style.display = "flex";
+            $("menu").style.display = "flex";
+        }
+    }
+
+    function updateHeaderUI(userName) {
+        $("userInfo").innerText = userName;
+        const avatar = $("userAvatar");
+        avatar.innerText = (userName || "?").charAt(0).toUpperCase();
+    }
+
+    $("loginBtn").onclick = async () => {
+        const login = $("loginInput").value.trim();
+        const pass = $("passwordInput").value.trim();
+        if (!login || !pass) return showAuthError("Введите логин и пароль");
+
+        try {
+            const res = await fetch(`${API}/auth/login`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({login: login, password: pass})
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                return showAuthError(data.error || "Неверный логин или пароль");
+            }
+
+            const data = await res.json();
+            saveTokens(data.accessToken, data.refreshToken);
+            currentUser = login;
+            localStorage.setItem('currentUser', currentUser);
+
+            updateHeaderUI(currentUser);
+            $("authModal").style.display = "none";
+            $("topBar").style.display = "flex";
+            $("menu").style.display = "flex";
+            hideError();
+            refreshPanels();
+            startFeedPolling();
+        } catch (e) {
+            showAuthError("Ошибка соединения с сервером");
+        }
+    };
+
+    $("signupBtn").onclick = async () => {
+        const login = $("loginInput").value.trim();
+        const pass = $("passwordInput").value.trim();
+        if (!login || !pass) return showAuthError("Введите логин и пароль");
+
+        try {
+            const res = await fetch(`${API}/auth/signup`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({login: login, password: pass})
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                return showAuthError(data.error || "Ошибка регистрации");
+            }
+
+            showAuthSuccess("Регистрация успешна! Теперь войдите.");
+        } catch (e) {
+            showAuthError("Ошибка соединения с сервером");
+        }
+    };
+
+    $("passwordInput").addEventListener("keydown", e => {
+        if (e.key === "Enter") $("loginBtn").click();
+    });
+
+    $("logoutBtn").onclick = () => {
+        forceLogout("Вы успешно вышли из системы");
+    };
+
+
+    function resetGame() {
+        gameId = null;
+        board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+        mode = null;
+        status = null;
+        currentPlayer = null;
+        winner = null;
+        playerX = null;
+        playerO = null;
+        createdAt = null;
+        cells = [];
+
+        boardDiv.style.display = "none";
+        boardDiv.innerHTML = "";
+        statusDiv.innerText = "";
+        statusDiv.classList.remove("pulse");
+        $("gameControls").style.display = "none";
+        $("menu").style.display = "flex";
+        $("moveTimerContainer").style.display = "none";
+        $("gameUuid").style.display = "none";
+        hideWin();
+        hideError();
+        stopMoveTimer();
+
+        const wrapper = $("boardWrapper");
+        if (wrapper) {
+            wrapper.classList.remove("switching-out", "switching-in");
+        }
+    }
+
+
+    $("botBtn").onclick = async () => {
+        hideError();
+        statusDiv.innerText = "Создание игры...";
+        statusDiv.classList.add("pulse");
+        $("menu").style.display = "none";
+
+        try {
+            const res = await fetchWithAuth(`${API}/game/new`, {
+                method: "POST"
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                showError(data.error || "Ошибка создания игры");
+                resetGame();
+                return;
+            }
+            const data = await res.json();
+            initGameFromServer(data);
+            await updateStatusText();
+        } catch (e) {
+            showError("Ошибка соединения с сервером");
+            resetGame();
+        }
+    };
+
+
+    $("humanBtn").onclick = async () => {
+        hideError();
+        statusDiv.innerText = "Поиск игры...";
+        statusDiv.classList.add("pulse");
+        $("menu").style.display = "none";
+
+        try {
+            const waitRes = await fetchWithAuth(`${API}/game/waiting`);
+            if (!waitRes.ok) {
+                const data = await waitRes.json().catch(() => ({}));
+                showError(data.error || "Ошибка поиска игры");
+                resetGame();
+                return;
+            }
+            const waiting = await waitRes.json();
+
+            if (waiting.length > 0) {
+                const target = waiting[0];
+                const joinRes = await fetchWithAuth(`${API}/game/${target.id}/join`, {
+                    method: "POST"
+                });
+                if (!joinRes.ok) {
+                    const data = await joinRes.json().catch(() => ({}));
+                    showError(data.error || "Не удалось подключиться к игре");
+                    resetGame();
+                    return;
+                }
+                const data = await joinRes.json();
+                initGameFromServer(data);
+                await updateStatusText();
+                return;
+            }
+
+            const res = await fetchWithAuth(`${API}/game/new/human`, {
+                method: "POST"
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                showError(data.error || "Ошибка создания игры");
+                resetGame();
+                return;
+            }
+            const data = await res.json();
+            initGameFromServer(data);
+            await updateStatusText();
+        } catch (e) {
+            showError("Ошибка соединения с сервером");
+            resetGame();
+        }
+    };
+
+
+    function initGameFromServer(data) {
+        gameId = data.id;
+        board = data.board.cells;
+        status = data.status;
+        mode = data.mode;
+        currentPlayer = data.currentPlayer;
+        winner = data.winner;
+        playerX = data.playerX;
+        playerO = data.playerO;
+        createdAt = data.createdAt || Date.now();
+
+        boardDiv.style.display = "grid";
+        $("gameControls").style.display = "flex";
+        $("menu").style.display = "none";
+
+
+        const uuidEl = $("gameUuid");
+        uuidEl.innerText = "ID: " + gameId;
+        uuidEl.style.display = "block";
+
+        createBoard();
+        renderBoard();
+        resetMoveTimer();
+        startPolling();
+    }
+
+
+    function createBoard() {
+        boardDiv.innerHTML = "";
+        cells = [];
+        for (let x = 0; x < 3; x++) {
+            cells[x] = [];
+            for (let y = 0; y < 3; y++) {
+                const cell = document.createElement("div");
+                cell.className = "cell";
+                cell.dataset.v = "-1";
+                cells[x][y] = cell;
+                boardDiv.appendChild(cell);
+            }
+        }
+    }
+
+
+    function renderBoard() {
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                const cell = cells[x][y];
+                const v = board[x][y];
+                const prevV = parseInt(cell.dataset.v);
+
+                if (prevV !== v) {
+                    cell.className = "cell";
+                    if (v === 1) {
+                        cell.innerText = "X";
+                        cell.classList.add("x");
+                    } else if (v === 2) {
+                        cell.innerText = "O";
+                        cell.classList.add("o");
+                    } else {
+                        cell.innerText = "";
+                    }
+                    cell.dataset.v = v;
+                }
+
+                cell.onclick = () => makeMove(x, y);
+            }
+        }
+    }
+
+
+    function startPolling() {
+        waitForUpdate();
+    }
+
+    async function waitForUpdate() {
+        if (!gameId) return;
+        if (status === "FINISHED" || status === "DRAW") return;
+
+        try {
+            const res = await fetchWithAuth(`${API}/game/${gameId}/wait`);
+
+            if (res.status === 204) {
+
+                setTimeout(waitForUpdate, 1000);
+                return;
+            }
+
+            if (res.ok) {
+                const data = await res.json();
+
+                const prevStatus = status;
+                board = data.board.cells;
+                status = data.status;
+                mode = data.mode;
+                currentPlayer = data.currentPlayer;
+                winner = data.winner;
+                playerX = data.playerX;
+                playerO = data.playerO;
+
+                renderBoard();
+                await updateStatusText();
+                await checkEndGame();
+
+
+                if (prevStatus !== status || data.currentPlayer !== currentPlayer) {
+                    resetMoveTimer();
+                }
+
+                if (status === "FINISHED" || status === "DRAW") return;
+
+                setTimeout(waitForUpdate, 1000);
+                return;
+            }
+        } catch (e) {
+            console.error("[LONG POLL] error:", e);
+            setTimeout(waitForUpdate, 5000);
+        }
+    }
+
+    async function updateStatusText() {
+        if (status === "WAITING") {
+            statusDiv.innerText = "Ожидание второго игрока...";
+            statusDiv.classList.add("pulse");
+            return;
+        }
+
+        statusDiv.classList.remove("pulse");
+
+        if (status === "IN_PROGRESS") {
+            const name = await fetchUserName(currentPlayer);
+            if (currentPlayer === myUserId) {
+                statusDiv.innerText = `Ваш ход (${name})`;
+            } else {
+                statusDiv.innerText = `Ход соперника (${name})`;
+            }
+        }
+    }
+
+    async function checkEndGame() {
+        if (status === "FINISHED" && winner) {
+            const winnerName = await fetchUserName(winner);
+            if (winner === myUserId) {
+                showWin(`🏆 Вы победили! (${winnerName})`);
+            } else {
+                showWin(`💀 Вы проиграли! Победил ${winnerName}`);
+            }
+            $("gameControls").style.display = "flex";
+            stopMoveTimer();
+            $("moveTimerContainer").style.display = "none";
+            refreshPanels();
+        } else if (status === "DRAW") {
+            showWin("🤝 Ничья!");
+            $("gameControls").style.display = "flex";
+            stopMoveTimer();
+            $("moveTimerContainer").style.display = "none";
+            refreshPanels();
+        }
+    }
+
+
+    async function makeMove(x, y) {
+        if (!gameId) return;
+
+        const mySign = (myUserId === playerX) ? 1 : 2;
+        board[x][y] = mySign;
+        renderBoard();
+
+        statusDiv.innerText = "Отправка хода...";
+
+        try {
+            const res = await fetchWithAuth(`${API}/game/${gameId}`, {
+                method: "POST",
+                body: JSON.stringify({cells: board})
+            });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                showError(data.error || `Ошибка сервера: ${res.status}`);
+                await updateFromServer();
+                return;
+            }
+
+            const data = await res.json();
+            board = data.board.cells;
+            status = data.status;
+            mode = data.mode;
+            currentPlayer = data.currentPlayer;
+            winner = data.winner;
+            playerX = data.playerX;
+            playerO = data.playerO;
+
+            renderBoard();
+            await updateStatusText();
+            await checkEndGame();
+            hideError();
+            resetMoveTimer();
+        } catch (e) {
+            showError("Ошибка соединения с сервером");
+            await updateFromServer();
+        }
+    }
+
+    async function updateFromServer() {
+        if (!gameId) return;
+        try {
+            const res = await fetchWithAuth(`${API}/game/${gameId}`);
+            if (res.ok) {
+                const data = await res.json();
+                const prevStatus = status;
+                board = data.board.cells;
+                status = data.status;
+                mode = data.mode;
+                currentPlayer = data.currentPlayer;
+                winner = data.winner;
+                playerX = data.playerX;
+                playerO = data.playerO;
+                renderBoard();
+                await updateStatusText();
+                await checkEndGame();
+                if (prevStatus !== status || data.currentPlayer !== currentPlayer) {
+                    resetMoveTimer();
+                }
+            }
+        } catch (e) {
+            console.error("updateFromServer error:", e);
+        }
+    }
+
+
+    function resetMoveTimer() {
+        stopMoveTimer();
+
+        if (status !== "IN_PROGRESS") {
+            $("moveTimerContainer").style.display = "none";
+            return;
+        }
+
+        $("moveTimerContainer").style.display = "flex";
+        moveTimerRemaining = moveTimerTotal;
+        updateMoveTimerDisplay();
+
+        moveTimerIntervalId = setInterval(() => {
+            moveTimerRemaining--;
+            if (moveTimerRemaining <= 0) {
+                moveTimerRemaining = 0;
+                updateMoveTimerDisplay();
+                stopMoveTimer();
+                return;
+            }
+            updateMoveTimerDisplay();
+        }, 1000);
+    }
+
+    function updateMoveTimerDisplay() {
+        const fg = $("moveTimerFg");
+        const text = $("moveTimerText");
+        const fraction = moveTimerRemaining / moveTimerTotal;
+        const offset = MOVE_TIMER_CIRCUMFERENCE * (1 - fraction);
+
+        fg.setAttribute("stroke-dashoffset", offset);
+        text.innerText = moveTimerRemaining;
+
+
+        if (moveTimerRemaining <= 5) {
+            fg.classList.add("urgent");
+        } else {
+            fg.classList.remove("urgent");
+        }
+    }
+
+    function stopMoveTimer() {
+        if (moveTimerIntervalId) {
+            clearInterval(moveTimerIntervalId);
+            moveTimerIntervalId = null;
+        }
+    }
+
+
+    $("newGameBtn").onclick = async () => {
+        hideWin();
+        hideError();
+
+        const currentMode = mode;
+
+        gameId = null;
+        board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+        status = null;
+        currentPlayer = null;
+        winner = null;
+        playerX = null;
+        playerO = null;
+        createdAt = null;
+        cells = [];
+
+        boardDiv.innerHTML = "";
+        boardDiv.style.display = "none";
+        statusDiv.innerText = "Создание игры...";
+        statusDiv.classList.add("pulse");
+        stopMoveTimer();
+        $("moveTimerContainer").style.display = "none";
+        $("gameUuid").style.display = "none";
+
+        try {
+            let res;
+            if (currentMode === "BOT") {
+                res = await fetchWithAuth(`${API}/game/new`, {method: "POST"});
+            } else {
+                res = await fetchWithAuth(`${API}/game/new/human`, {method: "POST"});
+            }
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                showError(data.error || "Ошибка создания игры");
+                resetGame();
+                return;
+            }
+
+            const data = await res.json();
+            initGameFromServer(data);
+            await updateStatusText();
+        } catch (e) {
+            showError("Ошибка соединения с сервером");
+            resetGame();
+        }
+    };
+
+    $("leaveBtn").onclick = () => resetGame();
+
+
+    async function fetchPanelData(url) {
+        try {
+            const headers = {"Content-Type": "application/json"};
+            if (accessToken) {
+                headers["Authorization"] = "Bearer " + accessToken;
+            }
+            const res = await fetch(url, {headers});
+            return res;
+        } catch (e) {
+            console.error("Panel fetch error:", e);
+            return null;
+        }
+    }
+
+    function setPanelBlurred(panel, blurred) {
+        if (blurred) {
+            panel.classList.add("blurred");
+        } else {
+            panel.classList.remove("blurred");
+        }
+    }
+
+    async function loadLeaderboard() {
+        const panel = document.getElementById("leaderboardPanel");
+        const loading = document.getElementById("lbLoading");
+        const table = document.getElementById("lbTable");
+        const empty = document.getElementById("lbEmpty");
+        const body = document.getElementById("lbBody");
+
+        loading.style.display = "block";
+        table.style.display = "none";
+        empty.style.display = "none";
+
+        const res = await fetchPanelData(`${API}/leaderboard?n=10`);
+
+        if (!res || res.status === 401) {
+            setPanelBlurred(panel, true);
+            loading.style.display = "none";
+            empty.style.display = "block";
+            empty.innerText = "🔒 Войдите чтобы увидеть";
+            return;
+        }
+
+        if (!res.ok) {
+            setPanelBlurred(panel, true);
+            loading.style.display = "none";
+            empty.style.display = "block";
+            empty.innerText = "Ошибка загрузки";
+            return;
+        }
+
+        const data = await res.json();
+        setPanelBlurred(panel, false);
+        loading.style.display = "none";
+
+        if (!data || data.length === 0) {
+            empty.style.display = "block";
+            empty.innerText = "Нет данных";
+            return;
+        }
+
+        body.innerHTML = "";
+        data.forEach((entry, i) => {
+            const tr = document.createElement("tr");
+            const rank = (i + 1) <= 3 ? ["🥇", "🥈", "🥉"][i] : (i + 1);
+            tr.innerHTML = `
+                <td class="rank">${rank}</td>
+                <td class="login-col" title="${escapeHtml(entry.login)}">${escapeHtml(entry.login)}</td>
+                <td class="ratio-col">${entry.ratio.toFixed(2)}</td>
+            `;
+            body.appendChild(tr);
+        });
+        table.style.display = "table";
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+    }
+
+    async function loadHistory() {
+        const panel = document.getElementById("historyPanel");
+        const loading = document.getElementById("histLoading");
+        const list = document.getElementById("histList");
+        const empty = document.getElementById("histEmpty");
+
+        loading.style.display = "block";
+        list.style.display = "none";
+        empty.style.display = "none";
+
+        const res = await fetchPanelData(`${API}/user/games/finished`);
+
+        if (!res || res.status === 401) {
+            setPanelBlurred(panel, true);
+            loading.style.display = "none";
+            empty.style.display = "block";
+            empty.innerText = "🔒 Войдите чтобы увидеть";
+            return;
+        }
+
+        if (!res.ok) {
+            setPanelBlurred(panel, true);
+            loading.style.display = "none";
+            empty.style.display = "block";
+            empty.innerText = "Ошибка загрузки";
+            return;
+        }
+
+        const data = await res.json();
+        setPanelBlurred(panel, false);
+        loading.style.display = "none";
+
+        if (!data || data.length === 0) {
+            empty.style.display = "block";
+            empty.innerText = "Нет завершённых игр";
+            return;
+        }
+
+        list.innerHTML = "";
+        const recent = data.slice(-20).reverse();
+        for (const game of recent) {
+            const li = document.createElement("li");
+            li.className = "sidebar-history-item";
+
+            const resultMap = {
+                "WIN": {cls: "win", text: "ПОБЕДА"},
+                "LOSS": {cls: "loss", text: "ПОРАЖЕНИЕ"},
+                "DRAW": {cls: "draw", text: "Ничья"}
+            };
+            const r = resultMap[game.result] || {cls: "draw", text: "???"};
+
+            const oppId = game.opponentId;
+            const oppName = game.opponentLogin || "???";
+            if (oppId && oppId !== BOT_UUID && oppId !== "unknown") {
+                userNameCache[oppId] = oppName;
+            }
+            const botIcon = oppId === BOT_UUID ? "🤖 " : "";
+
+            li.innerHTML = `
+                <span class="opponent" title="${escapeHtml(oppId)}">${botIcon}${escapeHtml(oppName)}</span>
+                <span class="result ${r.cls}">${r.text}</span>
+            `;
+            list.appendChild(li);
+        }
+        list.style.display = "block";
+    }
+
+    async function refreshPanels() {
+        await Promise.all([loadLeaderboard(), loadHistory()]);
+    }
+
+
+    async function loadActiveGames() {
+        if (!myUserId || !accessToken) return;
+
+        const gameIdsToFetch = new Set();
+
+
+        try {
+            const waitRes = await fetchWithAuth(`${API}/game/waiting`);
+            if (waitRes.ok) {
+                const waiting = await waitRes.json();
+                for (const g of waiting) {
+                    if (g.playerX === myUserId || g.playerO === myUserId) {
+                        gameIdsToFetch.add(g.id);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Feed: error fetching waiting games:", e);
+        }
+
+
+        if (gameId && (status === "IN_PROGRESS" || status === "WAITING")) {
+            gameIdsToFetch.add(gameId);
+        }
+
+
+        const games = [];
+        for (const id of gameIdsToFetch) {
+            try {
+                const res = await fetchWithAuth(`${API}/game/${id}`);
+                if (res.ok) {
+                    const data = await res.json();
+
+                    if (data.status === "WAITING" || data.status === "IN_PROGRESS") {
+
+                        if (data.playerX === myUserId || data.playerO === myUserId) {
+                            games.push(data);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error(`Feed: error fetching game ${id}:`, e);
+            }
+        }
+
+
+        games.sort((a, b) => {
+            if (a.status === "IN_PROGRESS" && b.status !== "IN_PROGRESS") return -1;
+            if (a.status !== "IN_PROGRESS" && b.status === "IN_PROGRESS") return 1;
+            return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+
+        activeGames = games;
+        renderActiveGamesFeed();
+    }
+
+    function renderActiveGamesFeed() {
+        const scroll = $("feedScroll");
+        const empty = $("feedEmpty");
+
+        if (!activeGames || activeGames.length === 0) {
+            scroll.innerHTML = "";
+            scroll.style.display = "none";
+            empty.style.display = "flex";
+            return;
+        }
+
+        empty.style.display = "none";
+        scroll.style.display = "flex";
+        scroll.innerHTML = "";
+
+        for (const game of activeGames) {
+            const card = document.createElement("div");
+            card.className = "feed-card";
+            if (game.id === gameId) {
+                card.classList.add("current-game");
+            }
+
+
+            const miniBoard = renderMiniBoardHtml(game.board.cells);
+
+
+            const opponentId = (game.playerX === myUserId) ? game.playerO : game.playerX;
+            let opponentName = "Ожидание...";
+            if (opponentId) {
+                if (opponentId === BOT_UUID) {
+                    opponentName = "🤖 Бот";
+                } else if (userNameCache[opponentId]) {
+                    opponentName = userNameCache[opponentId];
+                } else {
+
+                    fetchUserName(opponentId).then(name => {
+                        if (name) {
+                            const el = card.querySelector(".feed-opponent");
+                            if (el) el.textContent = name;
+                        }
+                    });
+                    opponentName = "...";
+                }
+            }
+
+
+            const dateStr = formatDate(game.createdAt);
+
+
+            const timerTotal = game.status === "WAITING" ? 60 : 15;
+
+
+            const shortUuid = (game.id && game.id.length >= 8) ? game.id.substring(0, 8) : (game.id || '');
+
+            card.innerHTML = `
+                <div class="feed-uuid" title="${escapeHtml(game.id)}">${escapeHtml(shortUuid)}</div>
+                <div class="feed-mini-board">${miniBoard}</div>
+                <div class="feed-opponent">${escapeHtml(opponentName)}</div>
+                <div class="feed-date">${dateStr}</div>
+                <div class="feed-timer-container">
+                    <svg class="feed-timer-ring" viewBox="0 0 22 22" width="22" height="22">
+                        <circle class="bg" cx="11" cy="11" r="9"/>
+                        <circle class="fg" cx="11" cy="11" r="9"
+                                stroke-dasharray="56.55" stroke-dashoffset="0"/>
+                    </svg>
+                    <span class="feed-timer-text">${timerTotal}</span>
+                </div>
+            `;
+
+
+            card._gameData = {
+                id: game.id,
+                status: game.status,
+                createdAt: game.createdAt,
+                timerTotal: timerTotal
+            };
+
+            card.addEventListener("click", () => switchToGame(game.id));
+            scroll.appendChild(card);
+        }
+    }
+
+    function renderMiniBoardHtml(cellsArr) {
+        if (!cellsArr) return "";
+        let html = "";
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                const v = (cellsArr[x] && cellsArr[x][y]) ? cellsArr[x][y] : 0;
+                let cls = "";
+                let sym = "";
+                if (v === 1) {
+                    cls = "x";
+                    sym = "X";
+                } else if (v === 2) {
+                    cls = "o";
+                    sym = "O";
+                }
+                html += `<div class="feed-mini-cell ${cls}">${sym}</div>`;
+            }
+        }
+        return html;
+    }
+
+    function updateFeedTimers() {
+        const cards = document.querySelectorAll(".feed-card");
+        const now = Date.now();
+
+        cards.forEach(card => {
+            const gd = card._gameData;
+            if (!gd) return;
+
+            let remaining;
+            if (gd.status === "WAITING") {
+
+                const deadline = (gd.createdAt || now) + 60000;
+                remaining = Math.max(0, Math.ceil((deadline - now) / 1000));
+            } else {
+
+
+                remaining = Math.max(0, Math.ceil(((gd.createdAt || now) + 15000 - now) / 1000));
+
+                if (remaining > 15) remaining = 15;
+            }
+
+            const total = gd.timerTotal;
+            const fraction = Math.min(1, Math.max(0, remaining / total));
+            const fg = card.querySelector(".feed-timer-ring .fg");
+            const text = card.querySelector(".feed-timer-text");
+
+            if (fg) {
+                const circumference = 2 * Math.PI * 9;
+                fg.setAttribute("stroke-dashoffset", circumference * (1 - fraction));
+                if (remaining <= 5) {
+                    fg.classList.add("urgent");
+                } else {
+                    fg.classList.remove("urgent");
+                }
+            }
+            if (text) {
+                text.textContent = remaining;
+            }
+        });
+    }
+
+    function startFeedPolling() {
+        stopFeedPolling();
+
+
+        loadActiveGames();
+
+
+        feedIntervalId = setInterval(() => {
+            loadActiveGames();
+        }, 3000);
+
+
+        feedTimerIntervalId = setInterval(() => {
+            updateFeedTimers();
+        }, 1000);
+    }
+
+    function stopFeedPolling() {
+        if (feedIntervalId) {
+            clearInterval(feedIntervalId);
+            feedIntervalId = null;
+        }
+        if (feedTimerIntervalId) {
+            clearInterval(feedTimerIntervalId);
+            feedTimerIntervalId = null;
+        }
+    }
+
+    async function switchToGame(targetGameId) {
+        if (!targetGameId || targetGameId === gameId) return;
+
+
+        stopMoveTimer();
+
+
+        const wrapper = $("boardWrapper");
+        wrapper.classList.add("switching-out");
+
+
+        await new Promise(r => setTimeout(r, 280));
+
+
+        gameId = null;
+        board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+        status = null;
+        currentPlayer = null;
+        winner = null;
+        playerX = null;
+        playerO = null;
+        createdAt = null;
+        cells = [];
+        boardDiv.innerHTML = "";
+        boardDiv.style.display = "none";
+        $("gameUuid").style.display = "none";
+        $("moveTimerContainer").style.display = "none";
+        hideWin();
+        hideError();
+        statusDiv.innerText = "Загрузка игры...";
+        statusDiv.classList.add("pulse");
+
+        wrapper.classList.remove("switching-out");
+
+        try {
+            const res = await fetchWithAuth(`${API}/game/${targetGameId}`);
+            if (!res.ok) {
+                showError("Не удалось загрузить игру");
+                resetGame();
+                return;
+            }
+            const data = await res.json();
+            initGameFromServer(data);
+            await updateStatusText();
+
+
+            wrapper.classList.add("switching-in");
+            setTimeout(() => wrapper.classList.remove("switching-in"), 450);
+        } catch (e) {
+            showError("Ошибка соединения с сервером");
+            resetGame();
+        }
+    }
+
+
+    checkExistingSession();
+    refreshPanels();
+
+
+    if (accessToken && refreshToken && myUserId) {
+        startFeedPolling();
+    }
+</script>
+
+</body>
+</html>
